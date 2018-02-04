@@ -1,18 +1,19 @@
 //settings
-var rows = 5,
-    columns = 9,
+var rows = 10,
+    columns = 20,
     increment = 1,
     intervalTime = 500;
 
 
-var startX = 1,
-    startY = 1,
+var currentX = 1,
+    currentY = 1,
     direction, //38 - up, 39 - right, 40 - down, 41 - left
-    gameStart = true,
+    gameStart = false,
     gameOver = false,
-    tail = 1,
-    arrSnakeX = [],
-    arrSnakeY = [];
+    tail = 2,
+    arrSnakeX = [1],
+    arrSnakeY = [1],
+    interval;
 
 createMap();
 
@@ -35,44 +36,91 @@ function createMap() {
 
 //creating snake
 var table = document.getElementsByTagName('table')[0];
-table.rows[startY].cells[startX].classList.add('snake');
+table.rows[currentY].cells[currentX].classList.add('snake');
+
+
+
+function Start(){
+    interval = setInterval(function() {
+      if (gameStart) {
+        update();
+      }
+
+      else if(gameOver) {
+        clearInterval(interval);
+      }
+
+    }, 200);
+}
 
 
 window.addEventListener('keydown', function(e) {
-  direction = e.keyCode;
-
-  if(direction == 40) {
-    moveSnake();
+  if(e.keyCode == 40 || e.keyCode == 39 || e.keyCode == 38 || e.keyCode == 37) {
+    direction = e.keyCode;
+    gameStart = true;
   }
 
 }, false)
 
 
 
-var ni = startY + 1;
-function moveSnake() {
-  if (gameStart) {
+//Обновление
+function update() {
+  if (direction == 40) { //up
+    if (currentY < table.rows.length - 1) {
+      ++currentY;
+    }
+  }
 
-    var interval = window.setInterval(function(){
-      if (direction == 40) {
-        console.log(ni);
-        if (ni < table.rows.length) {
-          table.rows[ni].cells[startX].classList.add('snake');
-          ni++;
-          arrSnakeY[arrSnakeY.length] = ni;
-          arrSnakeX[arrSnakeX.length] = startX;
-          console.log(arrSnakeY);
-          cutTail();
-        }
+  if (direction == 38) { //left
+    if (currentY < table.rows.length - 1) {
+      --currentY;
+    }
+  }
+
+  if (direction == 39) { //right
+    if (currentX < table.rows[currentY].cells.length - 1) {
+      ++currentX;
+    }
+  }
+
+  if (direction == 37) { //down
+    if (currentX < table.rows[currentY].cells.length - 1) {
+      --currentX;
+    }
+  }
+
+  table.rows[currentY].cells[currentX].classList.add('snake');
+  arrSnakeY[arrSnakeY.length] = currentY;
+  arrSnakeX[arrSnakeX.length] = currentX;
+
+  cutTail();
+}
+
+//Сохранение длины змейки
+function cutTail() {
+  var mustBeDeleted = arrSnakeY.length - tail; // количество элементов на удаление
+  console.log('Y = ' + arrSnakeY);
+  console.log('X = ' + arrSnakeX);
+
+  //alert("mustBeDeleted = " + mustBeDeleted) ;                                            // в зависимости от длины
+  if(mustBeDeleted >= 1) {
+      //создаем массив удаленных элементов X и Y
+      var deletedX = arrSnakeX.splice(0, mustBeDeleted);
+      var deletedY = arrSnakeY.splice(0, mustBeDeleted);
+      console.log('deletedX = ' + deletedX);
+      console.log('deletedY = ' + deletedY);
+
+      //в цикле удаляем лишний хвост
+      for(var i = 0; i < deletedX.length; i++) {
+        //alert('del Y = ' + deletedY[i]);
+        //alert('del X = ' + deletedX[i]);
+        table.rows[deletedY[i]].cells[deletedX[i]].classList.remove('snake');
+
 
       }
-    }, intervalTime);
-
   }
-}
-
-function cutTail() {
-  var mustBeDeleted = arrSnakeY.length - tail;
-  alert(mustBeDeleted);
 
 }
+
+Start();
