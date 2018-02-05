@@ -2,7 +2,7 @@
 var rows = 11,             // Height of map
     columns = 25,          // Width of map
     increment = 1,         // Growth of snake
-    intervalTime = 100,    // Speed game
+    intervalTime = 110,    // Speed game
     tail = 3;              // Length of tail
 
 var currentX = 1,                 // Сurrent X-coordinate
@@ -22,29 +22,68 @@ var currentX = 1,                 // Сurrent X-coordinate
 
 createMap();
 var table = document.getElementsByTagName('table')[0],
-    output = document.getElementsByClassName('scope')[0];
-    outRec = document.getElementsByClassName('rec')[0];
+    output = document.getElementsByClassName('scope')[0],
+    outRec = document.getElementsByClassName('rec')[0],
+    newGame = document.getElementsByClassName('newGame')[0],
+    menu = document.getElementsByClassName('darkness')[0];
 
-// Creating a SNAKE
-table.rows[currentY].cells[currentX].classList.add('snake');
+// Initialization of game objects
+function init() {
+  clean();
+  scope = 0;
+  output.style.display = 'none';
+  // Creating a SNAKE
+  currentX = 1,
+  currentY = 1,
+  table.rows[currentY].cells[currentX].classList.add('snake');
+  arrSnakeX = [currentX];
+  arrSnakeY = [currentY];
+  createWall();
+  createWall();
+  createWall();
+  createWall();
+  createFruit();
+}
 
-createWall();
-createWall();
-createWall();
-createWall();
-createFruit();
+init();
+
+
+// Start game
+function start(){
+  interval = setInterval(function() {
+    if (gameStart && !gameOver) {
+      update();
+      intervalTime = 100;
+    }
+
+    else if(gameOver) {
+      menu.style.opacity = 1;
+      gameOver = true;
+      gameStart = false;
+
+    }
+
+
+  }, intervalTime);
+}
+
 
 // Creating a MAP
 function createMap() {
   var map = document.createElement('table'),
       p = document.createElement('p'),
+      div = document.createElement('div'),
+      darkness = document.createElement('div'),
+      main = document.createElement('div'),
+      newGamebtn = document.createElement('button'),
       rec = document.createElement('p');
+      loseP = document.createElement('p');
+
   for(var i = 0; i < rows; i++) {
     var row = document.createElement('tr');
 
     for(var j = 0; j < columns; j++) {
       var column = document.createElement('td');
-      column.className = 'item'
       row.appendChild(column);
     }
 
@@ -52,15 +91,27 @@ function createMap() {
   }
 
   p.className = 'scope';
+  rec.className = 'rec';
+  darkness.className = 'darkness';
+  div.className = 'wrapper';
+  newGamebtn.className = 'newGame';
+
+  newGamebtn.innerHTML = 'Новая игра';
+  loseP.innerHTML = 'Вы проиграли';
   p.style.display = 'none';
 
-  rec.className = 'rec';
   if (record) {
     rec.innerHTML = 'Рекорд: ' + record;
   }
 
 
-  document.body.appendChild(map);
+  main.appendChild(div);
+
+  darkness.appendChild(newGamebtn);
+  darkness.appendChild(loseP);
+  div.appendChild(darkness);
+  div.appendChild(map);
+  document.body.appendChild(main);
   document.body.appendChild(p);
   document.body.appendChild(rec);
 }
@@ -97,25 +148,6 @@ function createWall() {
 }
 
 
-// Start game
-function start(){
-    interval = setInterval(function() {
-      if (gameStart && !gameOver) {
-        update();
-        intervalTime = 100;
-      }
-
-      else if(gameOver) {
-        clearInterval(interval);
-        alert('GameOver!');
-
-      }
-
-
-    }, intervalTime);
-}
-
-
 window.addEventListener('keydown', function(e) {
     if(e.keyCode == 40 && route !== 38 || e.keyCode == 39  && route !== 37 || e.keyCode == 38  && route !== 40 || e.keyCode == 37  && route !== 39) {
       direction = e.keyCode;
@@ -125,6 +157,14 @@ window.addEventListener('keydown', function(e) {
 
 }, false)
 
+newGame.addEventListener('click', function(){
+  menu.style.opacity = 0;
+
+  if (gameOver) {
+    init();
+    gameOver = false;
+  }
+}, false)
 
 // Updates
 function update() {
@@ -238,4 +278,14 @@ function rand( min, max ) {	// Generate a random integer
 	}
 }
 
+function clean() {
+  for(var i = 0; i < rows; i++) {
+    for(var j = 0; j < columns; j++) {
+      table.rows[i].cells[j].classList.remove('wall');
+      table.rows[i].cells[j].classList.remove('fruit');
+      table.rows[i].cells[j].classList.remove('snake');
+    }
+
+  }
+}
 start();
