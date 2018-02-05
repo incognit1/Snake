@@ -33,8 +33,10 @@ function init() {
   scope = 0;
   output.style.display = 'none';
   // Creating a SNAKE
-  currentX = 1,
-  currentY = 1,
+  currentX = 1;
+  currentY = 1;
+  tail = 3;
+  route = 0;
   table.rows[currentY].cells[currentX].classList.add('snake');
   arrSnakeX = [currentX];
   arrSnakeY = [currentY];
@@ -57,7 +59,7 @@ function start(){
     }
 
     else if(gameOver) {
-      menu.style.opacity = 1;
+      menu.style.display = 'block';
       gameOver = true;
       gameStart = false;
 
@@ -158,7 +160,7 @@ window.addEventListener('keydown', function(e) {
 }, false)
 
 newGame.addEventListener('click', function(){
-  menu.style.opacity = 0;
+  menu.style.display = 'none';
 
   if (gameOver) {
     init();
