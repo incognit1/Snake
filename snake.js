@@ -1,7 +1,7 @@
 //settings
 var rows = 11,             // Height of map
     columns = 25,          // Width of map
-    increment = 2,         // Growth of snake
+    increment = 1,         // Growth of snake
     intervalTime = 100,    // Speed game
     tail = 3;              // Length of tail
 
@@ -16,22 +16,29 @@ var currentX = 1,                 // Сurrent X-coordinate
     interval,                     // game interval
     fruitX,
     fruitY,
-    headDir = '';                 // direction of head
-
+    headDir = '',                 // direction of head
+    scope = 0,
+    record = sessionStorage.getItem('record');
 
 createMap();
-var table = document.getElementsByTagName('table')[0];
+var table = document.getElementsByTagName('table')[0],
+    output = document.getElementsByClassName('scope')[0];
+    outRec = document.getElementsByClassName('rec')[0];
 
 // Creating a SNAKE
 table.rows[currentY].cells[currentX].classList.add('snake');
 
+createWall();
+createWall();
+createWall();
+createWall();
 createFruit();
-
-
 
 // Creating a MAP
 function createMap() {
-  var map = document.createElement('table');
+  var map = document.createElement('table'),
+      p = document.createElement('p'),
+      rec = document.createElement('p');
   for(var i = 0; i < rows; i++) {
     var row = document.createElement('tr');
 
@@ -43,20 +50,52 @@ function createMap() {
 
     map.appendChild(row);
   }
+
+  p.className = 'scope';
+  p.style.display = 'none';
+
+  rec.className = 'rec';
+  if (record) {
+    rec.innerHTML = 'Рекорд: ' + record;
+  }
+
+
   document.body.appendChild(map);
+  document.body.appendChild(p);
+  document.body.appendChild(rec);
 }
 
 // Creating a FRUIT
 function createFruit() {
 
-  //проверка на несоответствие координатам змейки
+  // Check for positions with a wall and a snake
   do {
     fruitY = rand(0, rows - 1),
     fruitX = rand(0, columns - 1);
-  } while (table.rows[fruitY].cells[fruitX].classList.contains('snake'))
+  } while (table.rows[fruitY].cells[fruitX].classList.contains('snake') ||
+           table.rows[fruitY].cells[fruitX].classList.contains('wall'));
 
   table.rows[fruitY].cells[fruitX].classList.add('fruit');
 }
+
+
+function createWall() {
+  do {
+    wallX = rand(0, columns - 2);
+    wallY = rand(0, rows - 2);
+  } while (table.rows[wallY].cells[wallX].classList.contains('snake') ||
+          table.rows[wallY + 1].cells[wallX].classList.contains('snake') ||
+          table.rows[wallY].cells[wallX + 1].classList.contains('snake') ||
+          table.rows[wallY + 1].cells[wallX + 1].classList.contains('snake'));
+
+  table.rows[wallY].cells[wallX].classList.add('wall');
+  table.rows[wallY].cells[wallX+1].classList.add('wall');
+  table.rows[wallY+1].cells[wallX+1].classList.add('wall');
+  table.rows[wallY+1].cells[wallX].classList.add('wall');
+
+
+}
+
 
 // Start game
 function start(){
@@ -69,6 +108,7 @@ function start(){
       else if(gameOver) {
         clearInterval(interval);
         alert('GameOver!');
+
       }
 
 
@@ -128,14 +168,6 @@ function update() {
     else { gameOver = true; }
   }
 
-  // Snake on the fruit
-  if (currentX == fruitX && currentY == fruitY) {
-    tail += increment;
-    table.rows[fruitY].cells[fruitX].classList.remove('fruit');
-    createFruit();
-  }
-
-
 }
 
 // Clear the tail
@@ -157,11 +189,33 @@ function cutTail() {
 
 // Move the snake, move
 function move() {
-  // Collision with yourself
-  if(table.rows[currentY].cells[currentX].classList.contains('snake')) {
+
+  // Collision with yourself and with a wall
+  if( table.rows[currentY].cells[currentX].classList.contains('snake') ||
+      table.rows[currentY].cells[currentX].classList.contains('wall')) {
     gameOver = true;
   }
+
   else {
+    // Snake on the fruit
+    if (currentX == fruitX && currentY == fruitY) {
+      tail += increment;
+      table.rows[fruitY].cells[fruitX].classList.remove('fruit');
+      createFruit();
+
+      // Scope and record
+      scope += 3;
+      if (scope > record || !record) {
+        sessionStorage.setItem('record', scope);
+        record = sessionStorage.getItem('record');
+
+        outRec.innerHTML = 'Рекорд: ' + record;
+      }
+
+      output.innerHTML = 'Баллы: ' + scope;
+      output.style.display = 'block';
+    }
+
     table.rows[currentY].cells[currentX].style.borderRadius = headDir;
     table.rows[currentY].cells[currentX].classList.add('snake');
 
@@ -170,8 +224,6 @@ function move() {
 
     arrSnakeY[arrSnakeY.length] = currentY;
     arrSnakeX[arrSnakeX.length] = currentX;
-
-
 
     cutTail();
   }
@@ -185,6 +237,5 @@ function rand( min, max ) {	// Generate a random integer
 		return Math.floor(Math.random() * (min + 1));
 	}
 }
-
 
 start();
