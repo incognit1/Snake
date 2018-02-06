@@ -23,15 +23,20 @@ div {
   text-align: center;
 }
 
+.mushroom {
+  background: url(img/fly_agaric.png);
+  background-size: contain;
+  animation: anim 1s ease;
+}
+
 .snake {
   background: #333;
 }
 
 .fruit {
-  background: url(fruit.png);
+  animation: anim .6s ease;
   background-color: transparent;
   background-size: contain;
-
 }
 
 .wall {
@@ -90,6 +95,11 @@ p, .scope {
   top: 20%;
 }
 
+.anim-extinction {
+  animation: anim-extinction ease 1s;
+}
+
+
 @keyframes anim {
   from {
     transform: scale(0.5);
@@ -99,5 +109,17 @@ p, .scope {
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+@keyframes anim-extinction {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  to {
+    transform: scale(0.3);
+    opacity: 0;
   }
 }

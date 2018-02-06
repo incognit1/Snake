@@ -1,24 +1,28 @@
 //settings
-var rows = 11,             // Height of map
-    columns = 25,          // Width of map
+var rows = 15,             // Height of map
+    columns = 26,          // Width of map
     increment = 1,         // Growth of snake
-    intervalTime = 110,    // Speed game
-    tail = 3;              // Length of tail
+    intervalTime = 110;    // Speed game
 
 var currentX = 1,                 // Сurrent X-coordinate
     currentY = 1,                 // Сurrent Y-coordinate
     direction,                    // 37 - left, 38 - up, 39 - right, 40 - down
+    tail,                         // Length of tail
     route,                        // It is necessary for quick-press protection
     gameStart = false,
     gameOver = false,
     arrSnakeX = [currentX],       // Array of X-coordinates of the snake
     arrSnakeY = [currentY],       // Array of Y-coordinates of the snake
     interval,                     // game interval
+    intervalMushroom,
     fruitX,
     fruitY,
+    fruitType,
+    mushroomX,
+    mushroomY,
     headDir = '',                 // direction of head
     scope = 0,
-    record = sessionStorage.getItem('record');
+    record = localStorage.getItem('record');
 
 createMap();
 var table = document.getElementsByTagName('table')[0],
@@ -26,6 +30,12 @@ var table = document.getElementsByTagName('table')[0],
     outRec = document.getElementsByClassName('rec')[0],
     newGame = document.getElementsByClassName('newGame')[0],
     menu = document.getElementsByClassName('darkness')[0];
+
+
+init();
+start();
+
+
 
 // Initialization of game objects
 function init() {
@@ -47,26 +57,28 @@ function init() {
   createFruit();
 }
 
-init();
-
 
 // Start game
 function start(){
   interval = setInterval(function() {
     if (gameStart && !gameOver) {
       update();
-      intervalTime = 100;
     }
 
     else if(gameOver) {
       menu.style.display = 'block';
       gameOver = true;
       gameStart = false;
-
     }
 
-
   }, intervalTime);
+
+  intervalMushroom = setInterval(function() {
+       if (gameStart && !gameOver) {
+         createMushroom();
+       }
+
+  }, 15000);
 }
 
 
@@ -125,12 +137,28 @@ function createFruit() {
   do {
     fruitY = rand(0, rows - 1),
     fruitX = rand(0, columns - 1);
-  } while (table.rows[fruitY].cells[fruitX].classList.contains('snake') ||
-           table.rows[fruitY].cells[fruitX].classList.contains('wall'));
+    fruitType = rand(0, 10);
+  } while (table.rows[fruitY].cells[fruitX].getAttribute('class'));
 
   table.rows[fruitY].cells[fruitX].classList.add('fruit');
+  table.rows[fruitY].cells[fruitX].style.backgroundImage = 'url(img/' + fruitType + '.png)';
 }
 
+function createMushroom() {
+  if (mushroomY != undefined && mushroomX != undefined) {
+    table.rows[mushroomY].cells[mushroomX].classList.remove('mushroom');
+  }
+
+  setTimeout(function() {
+    do {
+      mushroomY = rand(0, rows - 1);
+      mushroomX = rand(0, columns - 1);
+    } while (table.rows[mushroomY].cells[mushroomX].getAttribute('class'));
+
+    table.rows[mushroomY].cells[mushroomX].classList.add('mushroom');
+  }, 5000)
+
+}
 
 function createWall() {
   do {
@@ -238,25 +266,36 @@ function move() {
     gameOver = true;
   }
 
+  // Collision with fruit
   else {
     // Snake on the fruit
     if (currentX == fruitX && currentY == fruitY) {
       tail += increment;
+      table.rows[fruitY].cells[fruitX].style.backgroundImage = '';
       table.rows[fruitY].cells[fruitX].classList.remove('fruit');
       createFruit();
 
       // Scope and record
       scope += 3;
       if (scope > record || !record) {
-        sessionStorage.setItem('record', scope);
-        record = sessionStorage.getItem('record');
+        localStorage.setItem('record', scope);
+        record = localStorage.getItem('record');
 
         outRec.innerHTML = 'Рекорд: ' + record;
       }
-
-      output.innerHTML = 'Баллы: ' + scope;
       output.style.display = 'block';
+
     }
+
+    //
+    else if( table.rows[currentY].cells[currentX].classList.contains('mushroom')) {
+      tail = Math.round(tail/2);
+      scope = Math.round(scope/2);
+      table.rows[currentY].cells[currentX].classList.remove('mushroom');
+
+    }
+    output.innerHTML = 'Баллы: ' + scope;
+
 
     table.rows[currentY].cells[currentX].style.borderRadius = headDir;
     table.rows[currentY].cells[currentX].classList.add('snake');
@@ -285,9 +324,11 @@ function clean() {
     for(var j = 0; j < columns; j++) {
       table.rows[i].cells[j].classList.remove('wall');
       table.rows[i].cells[j].classList.remove('fruit');
+      table.rows[i].cells[j].style.backgroundImage = '';
+      table.rows[i].cells[j].style.borderRadius = '';
       table.rows[i].cells[j].classList.remove('snake');
+      table.rows[i].cells[j].classList.remove('mushroom');
     }
 
   }
 }
-start();
