@@ -35,8 +35,6 @@ var table = document.getElementsByTagName('table')[0],
 init();
 start();
 
-
-
 // Initialization of game objects
 function init() {
   clean();
