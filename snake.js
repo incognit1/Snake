@@ -4,8 +4,8 @@ var rows = 14,             // Height of map
     increment = 1,         // Growth of snake
     intervalTime = 110;    // Speed game
 
-var currentX = 1,                 // Сurrent X-coordinate
-    currentY = 1,                 // Сurrent Y-coordinate
+var currentX = 1,                 // Current X-coordinate
+    currentY = 1,                 // Current Y-coordinate
     direction,                    // 37 - left, 38 - up, 39 - right, 40 - down
     tail,                         // Length of tail
     route,                        // It is necessary for quick-press protection
@@ -139,7 +139,6 @@ function createMap() {
 
 // Creating a FRUIT
 function createFruit() {
-
   // Check for positions with a wall and a snake
   do {
     fruitY = rand(0, rows - 1),
