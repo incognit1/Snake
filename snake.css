@@ -7,6 +7,10 @@ body{
 
 }
 
+audio {
+  display: none;
+}
+
 table {
   border-spacing: 1px;
   border: 30px solid #805744;
@@ -50,7 +54,7 @@ p, .scope {
   text-align: center;
   margin-top: 25px;
   color: #333;
-  animation: ease .5s anim;
+  animation: anim ease .5s;
 }
 
 .rec {
