@@ -112,7 +112,6 @@ function createMap() {
   newGamebtn.className = 'newGame';
   info.className = 'info';
 
-
   newGamebtn.type = "button";
   newGamebtn.value = 'Новая игра';
   info.innerHTML = 'Нажмите Enter чтобы начать новую игру';
@@ -134,6 +133,8 @@ function createMap() {
   document.body.appendChild(main);
   document.body.appendChild(p);
   document.body.appendChild(rec);
+
+  createButtonsGroup();
 }
 
 // Creating a FRUIT
@@ -191,7 +192,7 @@ window.addEventListener('keydown', function (e) {
     if (!gameStart) gameStart = true;
   }
 
-}, false)
+}, false);
 
 newGame.addEventListener('click', function () {
   menu.style.display = 'none';
@@ -201,7 +202,7 @@ newGame.addEventListener('click', function () {
     init();
     gameOver = false;
   }
-}, false)
+}, false);
 
 // Updates
 function update() {
@@ -354,6 +355,49 @@ function sound(sound) {
   else if (sound == 'mushroom') audio.src = './sounds/3.mp3'
   else if (sound == 'eat') audio.src = './sounds/4.mp3';
   audio.play();
+}
+
+function createButtonsGroup(){
+    var div = document.createElement('div'),
+        button1 = document.createElement('button'),
+        button2 = document.createElement('button'),
+        button3 = document.createElement('button'),
+        button4 = document.createElement('button');
+
+    div.className = 'btn-group';
+    button1.innerHTML = "Вниз";
+    button1.className = "down-btn";
+    button1.addEventListener('click', function () {
+        if (!gameStart) gameStart = true;
+        direction = 40;
+    });
+
+    button2.innerHTML = "Вправо";
+    button2.className = "right-btn";
+    button2.addEventListener('click', function () {
+        if (!gameStart) gameStart = true;
+        direction = 39;
+    });
+
+    button3.innerHTML = "Вверх";
+    button3.className = "up-btn";
+    button3.addEventListener('click', function () {
+        if (!gameStart) gameStart = true;
+        direction = 38;
+    });
+
+    button4.innerHTML = "Влево";
+    button4.className = "left-btn";
+    button4.addEventListener('click', function () {
+        if (!gameStart) gameStart = true;
+        direction = 37;
+    });
+
+    div.appendChild(button1);
+    div.appendChild(button2);
+    div.appendChild(button3);
+    div.appendChild(button4);
+    document.body.appendChild(div);
 }
 
 
